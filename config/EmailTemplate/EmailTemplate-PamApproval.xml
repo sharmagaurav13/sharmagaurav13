@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate created="1678444680172" id="c0a8006486cb18068186cb1953ec0069" name="PAM Approval">
+  <Body>
+      
+$launcher is requesting the following changes for $identityDisplayName on container '$containerDisplayName'.
+
+#foreach ($acctReq in $pamRequest.accountRequests)
+        Account: $acctReq.displayName
+#if ($acctReq.addedRightsCSV)
+   Added rights: $acctReq.addedRightsCSV
+#end
+#if ($acctReq.removedRightsCSV)
+ Removed rights: $acctReq.removedRightsCSV
+#end
+#end
+
+    </Body>
+  <Description>
+      Email Template for notifying approvers when they need to approve a request changes a user's permissions
+      on a PAM container..
+      Note that in addition to the declared arguments, all workflow variables,
+      Step arguments, and Approval arguments defined in the Workflow are
+      also available.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow" type="Workflow">
+        <Description>The Workflow object being executed.</Description>
+      </Argument>
+      <Argument name="item" type="WorkItem">
+        <Description>The WorkItem representing the review.</Description>
+      </Argument>
+      <Argument name="pamRequest" type="PAMRequestDTO">
+        <Description>The PAMRequestDTO with information about the request.</Description>
+      </Argument>
+      <Argument name="launcher" type="string">
+        <Description>The name of the Identity that launched the workflow.</Description>
+      </Argument>
+      <Argument name="identityName" type="string">
+        <Description>The name of the Identity that is being changed.</Description>
+      </Argument>
+      <Argument name="identityDisplayName" type="string">
+        <Description>The display name of the Identity that is being changed.</Description>
+      </Argument>
+      <Argument name="containerDisplayName" type="string">
+        <Description>The display name of the PAM container the user is having access modified on.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>Changes requested for $identityDisplayName on container '$containerDisplayName' need approval</Subject>
+</EmailTemplate>

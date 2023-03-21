@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule created="1678444679563" id="c0a8006486cb18068186cb19518b0063" language="beanshell" name="PAM Group Refresh" type="GroupAggregationRefresh">
+  <Description>This marks any external PAM group as non-requestable, since membership must be requested from on the external system.</Description>
+  <Signature returnType="Object">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+              The log object associated with the SailPointContext.
+            </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+              A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+            </Description>
+      </Argument>
+      <Argument name="environment" type="Map">
+        <Description>
+              Arguments passed to the aggregation task.
+            </Description>
+      </Argument>
+      <Argument name="obj" type="ResourceObject">
+        <Description>
+              A sailpoint.object.ResourceObject generated from the application
+              and the ProvisioningPlan's ObjectRequest.
+            </Description>
+      </Argument>
+      <Argument name="accountGroup" type="ManagedAttribute">
+        <Description>
+              The account group being refreshed.
+            </Description>
+      </Argument>
+      <Argument name="groupApplication" type="Application">
+        <Description>
+              Application being aggregated.
+            </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="accountGroup" type="ManagedAttribute">
+        <Description>
+              The refreshed account group object.
+            </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+        
+            // On a PAM application, a group is external if it has a non-null source.  If this is
+            // the case, make it non-requestable since access to the group must be requested through
+            // the external system rather than the PAM group.
+            if ("Privileged Account Management".equals(groupApplication.getType()) &amp;&amp;
+                (null != accountGroup.get("source"))) {
+                accountGroup.setRequestable(false);
+            }
+
+            return accountGroup;
+        
+      </Source>
+</Rule>

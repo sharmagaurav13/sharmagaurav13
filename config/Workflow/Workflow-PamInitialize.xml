@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow created="1678444680087" id="c0a8006486cb18068186cb1953960064" libraries="Identity,IdentityRequest" modified="1678444680138" name="PAM Initialize" type="Subprocess">
+  <Variable input="true" name="identityName" required="true">
+    <Description>
+      The name of the identity object being modified.
+    </Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      This may be passed in, if not the script queries for this
+      using a projection query and falls back to the name.
+    </Description>
+  </Variable>
+  <Variable initializer="PAM" input="true" name="flow">
+    <Description>
+      The flow is used to set the type on the IdentityRequest.
+    </Description>
+  </Variable>
+  <Variable input="true" name="plan" required="true">
+    <Description>The provisioning plan ready to execute.</Description>
+  </Variable>
+  <Variable input="true" name="optimisticProvisioning" required="true">
+    <Description>
+      Set to true to enable optimistic provisioning.  This will cause
+      changes to the entitlements compiled from role assignments to be
+      applied immediately to the identity cube rather than waiting
+      for the next refresh/reaggregation after the provisioning system
+      completes the request.
+    </Description>
+  </Variable>
+  <Variable initializer="false" name="trace">
+    <Description>
+      Used for debugging this subprocess and when set to true trace
+      statements will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable initializer="PAM" input="true" name="source">
+    <Description>
+      String version of sailpoint.object.Source to indicate
+      where the request originated.  Defaults to PAM.
+    </Description>
+  </Variable>
+  <Variable input="true" name="workItemPriority">
+    <Description>
+      String version of WorkItem.level that will be used
+      to set the priority any generated workitems. It will
+      also configure the priority of the request as
+      on the generated Access Request.
+    </Description>
+  </Variable>
+  <Variable name="project" output="true">
+    <Description>
+      A ProvisioningProject object describing the modifications to the identity.
+      This may include a list of Question objects which will
+      cause the generation of a Form and a WorkItem to solicit
+      additional information necessary for provisioning.
+    </Description>
+  </Variable>
+  <Variable name="identityRequestId" output="true">
+    <Description>
+      The id of the IdentityRequest created.
+    </Description>
+  </Variable>
+  <Variable name="identityRequest">
+    <Description>
+       The request object we get back from the create call. This is
+       primarily useful for debugging.
+    </Description>
+  </Variable>
+  <Description>
+      This workflow subprocess is used to initialize the various
+      object necessary when executing the PAM workflow.  This
+      creates the ProvisioningProject and IdentityRequest.
+  </Description>
+  <Step icon="Start" name="Start" posX="25" posY="15">
+    <Transition to="Compile Project"/>
+  </Step>
+  <Step action="call:compileProvisioningProject" icon="Task" name="Compile Project" posX="121" posY="15" resultVariable="project">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="requester" value="ref:launcher"/>
+    <Arg name="source" value="ref:source"/>
+    <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+    <Arg name="disableRetryRequest" value="false"/>
+    <Arg name="noApplicationTemplates" value="false"/>
+    <Arg name="noLocking" value="false"/>
+    <Description>Compile the provisioning plan into a provisioning project.
+      If you need to pass in provisioner options like "noFiltering"
+      or "noRoleDeprovisioning" you must pass them as explicit
+      arguments to the call.
+
+      The evaluation options "requester" and "source" are commonly
+      set here.
+
+      You can also pass things into the Template and Field scripts by
+      defining Args in this step.</Description>
+    <Transition to="Create Identity Request"/>
+  </Step>
+  <Step action="call:createIdentityRequest" icon="Task" name="Create Identity Request" posX="235" posY="15" resultVariable="identityRequest">
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="workItemPriority" value="ref:workItemPriority"/>
+    <Arg name="source" value="ref:source"/>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="340" posY="15"/>
+</Workflow>

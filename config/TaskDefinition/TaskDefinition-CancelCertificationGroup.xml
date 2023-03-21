@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition concurrent="true" created="1678444486191" executor="sailpoint.task.CancelCertificationGroupTask" hidden="true" id="c0a8006486cb16158186cb165e2f01ac" modified="1678444650458" name="Cancel Certification Group" progressMode="String" subType="task_item_type_certification" template="true" type="Certification">
+  <Description>
+            Template task for canceling a certification group.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="certificationGroupId" required="true" type="String">
+        <Description>
+                        The id of the certification group to cancel.
+                    </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>

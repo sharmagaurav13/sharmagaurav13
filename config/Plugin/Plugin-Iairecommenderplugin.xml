@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Plugin PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Plugin certificationLevel="None" created="1678444702362" displayName="IAIRecommender_title" id="c0a8006486cb18068186cb19aa9a0070" installDate="1678444702362" minSystemVersion="8.0" name="IAIRecommenderPlugin" version="1.3">
+  <Attributes>
+    <Map>
+      <entry key="recommenders">
+        <value>
+          <List>
+            <String>sailpoint.identityai.recommender.IAIRecommender</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="settings">
+        <value>
+          <List>
+            <Setting dataType="int" defaultValue="100" helpText="IAIRecommender_batch_size_help_text" label="IAIRecommender_batch_size_label" name="batchSize"/>
+          </List>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <File>
+    <Reference class="sailpoint.object.PersistedFile" id="c0a8006486cb18068186cb19aa7b006e" name="identityai-recommender-plugin.zip"/>
+  </File>
+</Plugin>

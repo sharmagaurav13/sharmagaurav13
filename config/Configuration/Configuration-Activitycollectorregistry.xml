@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Configuration PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Configuration created="1678444482352" id="c0a8006486cb16158186cb164f3000e1" modified="1678444646115" name="ActivityCollectorRegistry">
+  <Attributes>
+    <Map>
+      <entry key="CEF Log File" value="sailpoint.activity.LogFileActivityCollector"/>
+      <entry key="JDBC Collector" value="sailpoint.activity.JDBCActivityCollector"/>
+      <entry key="Log File" value="sailpoint.activity.LogFileActivityCollector"/>
+      <entry key="RACF Audit Log Collector" value="sailpoint.activity.RACFActivityCollector"/>
+      <entry key="Windows EventLog Collector" value="sailpoint.activity.WindowsEventLogCollector"/>
+    </Map>
+  </Attributes>
+</Configuration>
