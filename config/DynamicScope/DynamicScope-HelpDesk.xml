@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE DynamicScope PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<DynamicScope created="1678444664392" id="c0a8006486cb18068186cb191648001a" name="Help Desk">
+  <ApplicationRequestControl>
+    <Reference class="sailpoint.object.Rule" id="c0a8006486cb16158186cb165bb80193" name="Objects in Requestor&apos;s Authorized Scopes"/>
+  </ApplicationRequestControl>
+  <ManagedAttributeRequestControl>
+    <Reference class="sailpoint.object.Rule" id="c0a8006486cb16158186cb165cbb0197" name="All Objects"/>
+  </ManagedAttributeRequestControl>
+  <PopulationRequestAuthority allowAll="true"/>
+  <RoleRequestControl>
+    <Reference class="sailpoint.object.Rule" id="c0a8006486cb16158186cb165bb80193" name="Objects in Requestor&apos;s Authorized Scopes"/>
+  </RoleRequestControl>
+  <Selector>
+    <IdentitySelector>
+      <MatchExpression>
+        <MatchTerm name="capabilities" value="HelpDesk"/>
+      </MatchExpression>
+    </IdentitySelector>
+  </Selector>
+</DynamicScope>

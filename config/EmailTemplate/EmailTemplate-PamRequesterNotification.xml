@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate created="1678444680179" id="c0a8006486cb18068186cb1953f3006b" name="PAM Requester Notification">
+  <Body>
+The following changes you requested for identity '$identityDisplayName' on container '$containerDisplayName' were #if($pamRequest.isApproved())approved#if($!approverDisplayName) by ${approverDisplayName}#end and have been processed#{else}rejected#if($!approverDisplayName) by ${approverDisplayName}#end#end.
+
+#foreach ($acctReq in $pamRequest.accountRequests)
+        Account: $acctReq.displayName
+#if ($acctReq.addedRightsCSV)
+   Added rights: $acctReq.addedRightsCSV
+#end
+#if ($acctReq.removedRightsCSV)
+ Removed rights: $acctReq.removedRightsCSV
+#end
+#end
+      
+    </Body>
+  <Description>
+      Email Template for notifying requesters when their requests for PAM access modification are completed.
+      Note that in addition to the declared arguments, all workflow variables,
+      Step arguments, and Approval arguments defined in the Workflow are
+      also available.
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow" type="Workflow">
+        <Description>The Workflow object being executed.</Description>
+      </Argument>
+      <Argument name="launcher" type="string">
+        <Description>The name of the Identity that launched the workflow.</Description>
+      </Argument>
+      <Argument name="identityDisplayName" type="string">
+        <Description>The display name of the Identity that is being changed.</Description>
+      </Argument>
+      <Argument name="containerDisplayName" type="string">
+        <Description>The display name of the PAM container the user is having access modified on.</Description>
+      </Argument>
+      <Argument name="pamRequest" type="PAMRequestDTO">
+        <Description>The PAMRequestDTO with information about the request.</Description>
+      </Argument>
+      <Argument name="approverDisplayName" type="string">
+        <Description>The display name of the identity that approved this request, or null if the request did not require approval.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>The changes you requested for $identityDisplayName on container '$containerDisplayName' were processed</Subject>
+</EmailTemplate>

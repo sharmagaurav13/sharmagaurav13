@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition created="1678444486411" executor="sailpoint.task.CIBSyncTask" id="c0a8006486cb16158186cb165f0b01c1" modified="1678444650812" name="Identity IQ Cloud Gateway Synchronization Task" subType="task_item_type_system" template="true" type="System">
+  <Description>
+                Synchronize the specified objects to the Cloud Gateway.
+        </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="cloudApp" required="true" type="Application">
+        <Prompt>task_in_cloud_bridge_cloud_app</Prompt>
+      </Argument>
+      <Argument multi="true" name="hostedApps" required="true" type="Application">
+        <Prompt>task_in_cloud_bridge_apps_to_sync</Prompt>
+      </Argument>
+      <Argument multi="true" name="ruleNames" type="Rule">
+        <Prompt>task_in_cloud_bridge_rules_to_sync</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="appsSyncSuccessful" type="int">
+        <Prompt>task_out_cloud_bridge_apps_sync_success</Prompt>
+      </Argument>
+      <Argument name="appsSyncFailed" type="int">
+        <Prompt>task_out_cloud_bridge_apps_sync_failed</Prompt>
+      </Argument>
+      <Argument name="rulesSyncSuccessful" type="int">
+        <Prompt>task_out_cloud_bridge_rules_sync_success</Prompt>
+      </Argument>
+      <Argument name="rulesSyncFailed" type="int">
+        <Prompt>task_out_cloud_bridge_rules_sync_failed</Prompt>
+      </Argument>
+      <Argument name="systemConfigSyncSuccessful" type="int">
+        <Prompt>task_out_cloud_bridge_system_config__sync_success</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>

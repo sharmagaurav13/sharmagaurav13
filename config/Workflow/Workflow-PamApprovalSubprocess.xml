@@ -1,0 +1,228 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow created="1678444680097" explicitTransitions="true" id="c0a8006486cb18068186cb1953a10065" libraries="PAM,IdentityRequest,Identity" modified="1678444680144" name="PAM Approval Subprocess" type="Subprocess">
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity being updated.</Description>
+  </Variable>
+  <Variable input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      Query for this using a projection query and fall back to the name.
+    </Description>
+  </Variable>
+  <Variable input="true" name="containerName">
+    <Description>
+      The name of the Container ManagedAttribute on which the identity's access is being modified.
+    </Description>
+  </Variable>
+  <Variable input="true" name="containerDisplayName">
+    <Description>
+      The display name of the Container on which the identity's access is being modified.
+    </Description>
+  </Variable>
+  <Variable input="true" name="project" output="true">
+    <Description>
+      ProvisioningProject which is just a compiled version of the ProvisioningPlan.
+    </Description>
+  </Variable>
+  <Variable input="true" name="plan">
+    <Description>The provisioning plan.</Description>
+  </Variable>
+  <Variable input="true" name="approvalScheme">
+    <Description>
+      A csv string that specifies how approval items should be generated
+      for the incoming request.
+
+      The value can be "none", in which case approvals are disabled.
+
+      The value can also be a combination of any of the values below
+      in any order, separated by commas. The order in which they are
+      specified is the order in which they are processed:
+
+      manager
+        The manager gets the approval item.
+
+      identity
+        The identities/workgroups in the variable approvingIdentities get the approval item.
+    </Description>
+  </Variable>
+  <Variable input="true" name="approvingIdentities">
+    <Description>
+       List of identities and/or workgroups names/ids that should be involved in the approval
+       process.
+    </Description>
+  </Variable>
+  <Variable initializer="spadmin" input="true" name="fallbackApprover">
+    <Description>
+      A String that specifies the name of the Identity that will
+      be assigned any approvals where the owner of the approver
+      can't be resolved. Example if the scheme is "owner" and the
+      application doesn't specify and owner.
+    </Description>
+  </Variable>
+  <Variable input="true" name="managerElectronicSignature">
+    <Description>
+       The name of the electronic signature object that should be used when workitems
+       are completed by a manager.
+    </Description>
+  </Variable>
+  <Variable input="true" name="identityElectronicSignature">
+    <Description>
+       The name of the electronic signature object that should be used when workitems
+       are completed by object owners.
+    </Description>
+  </Variable>
+  <Variable initializer="PAM Approval" input="true" name="managerEmailTemplate">
+    <Description>
+       Name of the email template to use when manager of pending approvals.
+    </Description>
+  </Variable>
+  <Variable initializer="PAM Approval" input="true" name="identityEmailTemplate">
+    <Description>
+       Name of the email template to use when notifying the security officer of pending approvals.
+    </Description>
+  </Variable>
+  <Variable initializer="false" name="trace">
+    <Description>
+      Used for debugging this workflow and when set to true trace
+      will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable input="true" name="workItemDescription">
+    <Description>String "template" that will be used as the workitem description.</Description>
+  </Variable>
+  <Variable input="true" name="workItemEscalationTemplate">
+    <Description>The email template that should be used when sending out reminders.</Description>
+  </Variable>
+  <Variable input="true" name="workItemHoursBetweenReminders">
+    <Description>The number of hours to wait between sending reminders to approvers.</Description>
+  </Variable>
+  <Variable input="true" name="workItemHoursTillEscalation">
+    <Description>The number of hourse to wait until an approval should be escalated.</Description>
+  </Variable>
+  <Variable initializer="Normal" input="true" name="workItemPriority">
+    <Description>
+       The String version of a WorkItem.Priority. This variable is
+       used to set the priority on all of the workitems generated
+       as part of this workflow.
+    </Description>
+  </Variable>
+  <Variable input="true" name="workItemReminderTemplate">
+    <Description>
+      The email template that should be used when sending out reminders.  This must be set to enable
+      approval reminders.
+    </Description>
+  </Variable>
+  <Variable input="true" name="workItemEscalationRule">
+    <Description>The rule used to assign a new ownder during escalation.</Description>
+  </Variable>
+  <Variable input="true" name="workItemMaxReminders">
+    <Description>The maximum number of reminder emails that will be sent before we begin the escalation process.</Description>
+  </Variable>
+  <Variable input="true" name="pamRequest" output="true">
+    <Description>
+      The PamRequest that has information about the request.  The "approved" flag on the PamRequest will be updated
+      appropriately when the approval is approved/rejected.
+    </Description>
+  </Variable>
+  <Description>
+    Approval sub-process for PAM requests.  This generates approvals
+    based on the approvalScheme, audits the approval decisions, and
+    returns the approved status.
+  </Description>
+  <Step icon="Start" name="Start" posX="20" posY="22">
+    <Transition to="Approval"/>
+  </Step>
+  <Step icon="Approval" name="Approval" posX="158" posY="22">
+    <Approval mode="serial" owner="call:createApprovals" renderer="commonWorkItem.xhtml" return="pamRequest" send="identityDisplayName,identityName,containerName,containerDisplayName,plan,pamRequest">
+      <AfterScript>
+        <Source>
+          
+            import sailpoint.object.WorkItem;
+            import sailpoint.workflow.PAMLibrary;
+
+            // If there were no approvals generated, we will mark the request as approved. This
+            // can happen if the approval scheme is set to "none" or if the approvals are auto-completed.
+            if (approval.isComplete() &amp;&amp; (null == pamRequest.getApprovalState())) {
+                pamRequest.setApprovalState(WorkItem.State.Finished);
+            }
+
+            // After completing the approval, update the PamRequest and IdentityRequest status.
+            PAMLibrary.approvalWorkItemCompleted(wfcontext, pamRequest, item);
+          
+        </Source>
+      </AfterScript>
+      <Arg name="launcher" value="ref:launcher"/>
+      <Arg name="approvalMode" value="serial"/>
+      <Arg name="approvalScheme" value="ref:approvalScheme"/>
+      <Arg name="workItemDescription" value="ref:workItemDescription"/>
+      <Arg name="workItemEscalationRule" value="ref:workItemEscalationRule"/>
+      <Arg name="workItemEscalationTemplate" value="ref:workItemEscalationTemplate"/>
+      <Arg name="workItemHoursTillEscalation" value="ref:workItemHoursTillEscalation"/>
+      <Arg name="workItemMaxReminders" value="ref:workItemMaxReminders"/>
+      <Arg name="workItemHoursBetweenReminders" value="ref:workItemHoursBetweenReminders"/>
+      <Arg name="workItemNotificationTemplate" value="ref:approvalEmailTemplate"/>
+      <Arg name="workItemPriority" value="ref:workItemPriority"/>
+      <Arg name="workItemReminderTemplate" value="ref:workItemReminderTemplate"/>
+      <Arg name="workItemRequester" value="$(launcher)"/>
+      <InterceptorScript>
+        <Source>
+          
+            import sailpoint.object.Workflow;
+            import sailpoint.object.WorkItem;
+            import sailpoint.service.pam.PamApprovalService;
+            import sailpoint.service.pam.PamRequest;
+            import sailpoint.workflow.PAMLibrary;
+
+            if (Workflow.INTERCEPTOR_OPEN_WORK_ITEM.equals(method)) {
+                // After creating the work item, update the PamRequest and IdentityRequest status.
+                PAMLibrary.approvalWorkItemOpened(wfcontext, pamRequest, item);
+            }
+            else if (Workflow.INTERCEPTOR_PRE_ASSIMILATION.equals(method)) {
+                // When the approval is completed, propagate the state between the PamRequest and WorkItem.
+                // If this is being assimilated due to a decision being made, the PamRequest state will get copied
+                // onto the WorkItem.  If this is being assimilated due to an expired work item, the WorkItem state
+                // will get copied onto the PamRequest.
+                if (null != request) {
+                    request = PamApprovalService.getPamRequest(item);
+
+                    if (null != request.getApprovalState()) {
+                        item.setState(request.getApprovalState());
+                    }
+                    else if (null != item.getState()) {
+                        request.setApprovalState(item.getState());
+                    }
+                }
+            }
+          
+        </Source>
+      </InterceptorScript>
+    </Approval>
+    <Transition to="Refresh Project"/>
+  </Step>
+  <Step action="call:recompileProject" icon="Task" name="Refresh Project" posX="300" posY="22" resultVariable="project">
+    <Arg name="project" value="ref:project"/>
+    <Description>
+      Recompile the ProvisioningProject after approval.  This will filter any requests that may have already been
+      fulfilled in another PAM request since this was launched.
+    </Description>
+    <Transition to="Audit Approval Decision"/>
+  </Step>
+  <Step action="call:auditApprovalDecision" icon="Task" name="Audit Approval Decision" posX="440" posY="22">
+    <Arg name="approved" value="ref:approved"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="project" value="ref:project"/>
+    <Transition to="Refresh Identity Request"/>
+  </Step>
+  <Step action="call:refreshIdentityRequestAfterApproval" icon="Task" name="Refresh Identity Request" posX="580" posY="22">
+    <Arg name="project" value="ref:project"/>
+    <Arg name="approvalSet" value="call:createApprovalSetFromPamRequest"/>
+    <Arg name="splitProvisioning" value="false"/>
+    <Arg name="state" value="script: (pamRequest.isApproved()) ? &quot;Provision&quot; : &quot;Notify&quot;"/>
+    <Description>
+      Update the IdentityRequest with information from the approval.
+    </Description>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="720" posY="22"/>
+</Workflow>

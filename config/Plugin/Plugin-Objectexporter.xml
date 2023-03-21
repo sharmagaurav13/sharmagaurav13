@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Plugin PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Plugin certificationLevel="None" created="1678541819301" displayName="Object Exporter" id="c0a8006486d0164a8186d0e38d8103de" installDate="1678541819265" minSystemVersion="7.2" name="ObjectExporter" version="4.1.0">
+  <Attributes>
+    <Map>
+      <entry key="fullPage">
+        <value>
+          <FullPage title="Object Exporter"/>
+        </value>
+      </entry>
+      <entry key="taskExecutors">
+        <value>
+          <List>
+            <String>com.sailpoint.pse.plugin.objectexporter.ObjectExporter</String>
+          </List>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <File>
+    <Reference class="sailpoint.object.PersistedFile" id="c0a8006486d0164a8186d0e389a603dc" name="object-exporter-plugin-4.1.0.zip"/>
+  </File>
+</Plugin>

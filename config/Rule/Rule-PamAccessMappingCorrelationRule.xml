@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule created="1678444679495" id="c0a8006486cb18068186cb1951470062" language="beanshell" name="PAM Access Mapping Correlation Rule" type="TargetCorrelation">
+  <Description>This rule correlates PAM access mappings to the appropriate Link or ManagedAttribute.</Description>
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+              The log object associated with the SailPointContext.
+            </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+              A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+            </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+              The Application which owns the Target.
+            </Description>
+      </Argument>
+      <Argument name="nativeId">
+        <Description>
+              The native id associated with an AccessMapping.
+            </Description>
+      </Argument>
+      <Argument name="target">
+        <Description>
+              The Target being correlated.
+            </Description>
+      </Argument>
+      <Argument name="targetSource">
+        <Description>
+              The source of the configuration for the collector.
+            </Description>
+      </Argument>
+      <Argument name="isGroup">
+        <Description>
+              Indicates whether or not this is a GroupMapping.
+            </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="result">
+        <Description>
+              A Map containing either a ManagedAttribute object ('group') or the name ('groupAttributeName') and value ('groupAttributeValue') of a ManagedAttribute. Link may also be returned since targets may also be correlated to a link object.
+            </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+        import sailpoint.connector.Connector;
+
+        Map result = new HashMap();
+
+        // Add a list of possible applications.
+        List apps = new ArrayList();
+
+        // If the target source is on a single app, the "application" variable is available.  For multiple apps,
+        // the variable is named "applications".
+        if (void != application &amp;&amp; null != application) {
+            apps.add(application);
+        }
+        else if (void != applications &amp;&amp; null != applications) {
+            apps = new ArrayList(applications);
+        }
+        result.put("applications", apps);
+
+        if (isGroup) {
+            result.put("groupAttributeName", "nativeIdentity");
+            result.put("groupAttributeValue", nativeId);
+            result.put("groupType", Connector.TYPE_GROUP);
+        }
+        else {
+            result.put("linkIdentity", nativeId);
+        }
+
+        return result;
+      </Source>
+</Rule>

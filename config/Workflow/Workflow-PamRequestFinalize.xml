@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow created="1678444680124" id="c0a8006486cb18068186cb1953bc0067" libraries="Identity,IdentityRequest" modified="1678444680159" name="PAM Request Finalize" type="Subprocess">
+  <Variable name="project">
+    <Description>
+      ProvisioningProject which is just a compiled version of the ProvisioningPlan.
+      From the project the IdentityRequestItem model will be updated.
+    </Description>
+  </Variable>
+  <Variable input="true" name="identityRequestId" output="true">
+    <Description>
+       The ID ot the identitytRequestId.
+
+       This step will update the identityRequest status and completion
+       status.
+    </Description>
+  </Variable>
+  <Variable input="true" name="approvalSet">
+    <Description>
+      An ApprovalSet with information about the request.
+    </Description>
+  </Variable>
+  <Variable input="true" name="trace">
+    <Description>
+      Used for debugging this subprocess and when set to true trace
+      statements will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable name="autoVerifyIdentityRequest">
+    <Description>
+      Flag to indicate when finishing the request we should
+      automatically mark it verified.
+    </Description>
+  </Variable>
+  <Variable input="true" name="workItemPriority">
+    <Description>
+      String version of WorkItem.level that was used
+      to set the priority of the IdentityRequest and
+      workitems.
+    </Description>
+  </Variable>
+  <Step icon="Start" name="Start" posX="15" posY="12">
+    <Transition to="Complete Request"/>
+  </Step>
+  <Step action="call:completeIdentityRequest" icon="Task" name="Complete Request" posX="115" posY="12" resultVariable="identityRequest">
+    <Arg name="project" value="ref:project"/>
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="autoVerify" value="$(autoVerifyIdentityRequest)"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" name="end" posX="215" posY="12"/>
+</Workflow>
